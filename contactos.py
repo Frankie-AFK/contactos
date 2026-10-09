@@ -250,15 +250,144 @@ def configurar_lista_contactos(areas,configuracion):
                 return#Regresar al menu principal
             else:
                 print("Ingrese A o C")#Si pone otra cosa pedir de nuevo
+            
+
+
+#Opcion 1 Agregar Contactos
+
+def agregar_contactos(contactos, areas, configuracion):
+    while True:
+        print("LISTA DIGITAL DE CONTACTOS")
+        print()
+        print("REGISTRAR CONTACTOS: AGREGAR")
+        print()
+
+        telefono = input("Teléfono (C para cancelar): ")
+        if telefono == "C" or telefono == "c":
+            break
+        if not telefono.isdigit():
+            print("El teléfono debe contener solo números")
+            continue
+        if len(telefono) < 5 or len(telefono) > 12:
+            print("El teléfono debe tener entre 5 y 12 dígitos")
+            continue
+        telefono = int(telefono) #Convertir el telefono a entero
+        repetido = False #Suponer que el telefono no esta registrado
+        for dato in contactos: #Recorrer los contactos registrados
+            if dato[0] == telefono: #Comparar los numeros de telefono
+                repetido = True #El telefono ya existe
+                break #Dejar de buscar
+            if repetido == True: #Si el telefono ya esta registrado
+                print("ESTE TELÉFONO YA ESTÁ REGISTRADO")
+                continue #Volver a pedir el telefono
+            area = input("Área (Enter para usar área por omisión): ")
+            if area == "":
+                if len(configuracion) == 0:
+                    print("Primero debe configurar el área por omisión")
+                    continue
+                area = configuracion[0][0]
+        if not str(area).isdigit(): #Verificar que el area sea un numero
+            print("El área debe ser un número")
+            continue
+
+        area = int(area) #Convertir el area a entero
+        encontrado = False #Suponer que el area no existe
+
+        for dato in areas: #Recorrer las areas registradas
+            if dato[0] == area: #Comparar los codigos
+                encontrado = True #El area existe
+                print("Nombre del área:", dato[1])
+                break
+
+        if encontrado == False: #Si el area no esta registrada
+            print("ESTA ÁREA NO ESTÁ REGISTRADA, NO SE PUEDE SELECCIONAR")
+            continue
+            tipo = input("Tipo de teléfono (M/C/T/O, Enter por omisión): ")
+            if tipo == "":
+                if len(configuracion) == 0:
+                    print("Primero debe configurar el tipo de teléfono por omisión")
+                    continue
+                tipo = configuracion[0][1]
+            
+            if tipo == "m":
+                tipo = "M"
+            elif tipo == "c":
+                tipo = "C"
+            elif tipo == "t":
+                tipo = "T"
+            elif tipo == "o":
+                tipo = "O"
+            if tipo != "M" and tipo != "C" and tipo != "T" and tipo != "O":
+                print("ESTE TIPO DE TELÉFONO NO EXISTE, NO SE PUEDE SELECCIONAR")
+                continue
+            nombre = input("Nombre del contacto: ") #Pedir el nombre del contacto
+            if len(nombre) < 1 or len(nombre) > 50: #Verificar que tenga entre 1 y 50 caracteres
+                print("El nombre debe tener entre 1 y 50 caracteres")
+                continue #Volver a pedir los datos
+            correo = input("Correo electrónico: ") #Pedir el correo del contacto
+
+            if correo.count("@") != 1: #Verificar que tenga exactamente un @
+                print("El correo debe tener el formato parte1@parte2")
+                continue
+
+            partes = correo.split("@") #Separar el correo en dos partes
+
+            if partes[0] == "" or partes[1] == "": #Verificar que ninguna parte este vacia
+                print("El correo debe tener texto antes y despues del @")
+                continue
+
+            if " " in correo: #Verificar que no tenga espacios
+                print("El correo no puede contener espacios")
+                continue
 
 
 
+
+
+
+
+
+
+
+
+                
+#3.Registrar contactos
+
+def registrar_contactos(contactos, areas, configuracion):#Funcion para mostrar el menu de registrar contactos
+    while True:#Repetir el menu hasta que el usuario elija 0
+        print("LISTA DIGITAL DE CONTACTOS")
+        print()
+        print("REGISTRAR CONTACTOS")
+        print()
+        print("1. Agregar contactos")
+        print("2. Consultar contactos")
+        print("3. Modificar contactos")
+        print("4. Eliminar contactos")
+        print("0. Fin")
+        opcion = input("OPCIÓN _")#Pedir al usuario que elija una opcion
+        match opcion:#Revisar cual opcion eligio el usuario
+            case "1":#Opcion para agregar contactos
+                agregar_contactos(contactos, areas, configuracion)
+            case "2":#Opcion para consultar contactos
+                print("Consultar contactos")
+            case "3":#Opcion para modificar contactos
+                print("Modificar contactos")
+            case "4":#Opcion para eliminar contactos
+                print("Eliminar contactos")
+            case "0":#Regresar al menu principal
+                break
+            case _:#Si el usuario escribe una opcion que no existe
+                print("ESTA OPCIÓN NO EXISTE")
+
+    
+                
 #Funcion principal
 #Lista digital de contactos
                 
 def principal():
     areas = []
     configuracion = []
+    contactos = []
     TIPOS_TELEFONO = ("M", "Móvil", "C", "Casa", "T", "Trabajo", "O", "Otro")
     while True:
         print("     LISTA DIGITAL DE CONTACTOS")#Haciendo lo mas parecido a lo que esta en el pdf posible
@@ -278,6 +407,8 @@ def principal():
                 registrar_areas(areas) 
             case "2":
                 configurar_lista_contactos(areas,configuracion)
+            case "3":
+                registrar_contactos(contactos, areas, configuracion)
             case "0":
                 break
             case _:
