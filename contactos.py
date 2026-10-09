@@ -43,7 +43,6 @@ def agregar_areas(areas):
 
 
 
-
 #Opcion 2 Consultar areas
                 
 def consultar_areas(areas):
@@ -191,10 +190,75 @@ def registrar_areas(areas):
                 print("ESTA OPCIÓN NO EXISTE")
     return
 
+
+
+#2 Configuracion de la lista de contactos
+
+def configurar_lista_contactos(areas,configuracion):
+    while True:
+        print("       LISTA DIGITAL DE CONTACTOS")
+        print()
+        print("CONFIGURACIÓN DE LA LISTA DE CONTACTOS")
+        print()
+        area = input("Área por omisión       ")#Pedir el area que se va a usar por omision
+        if not area.isdigit():#Validar que sea un numero
+            print("El área debe ser un número")
+            continue#Volver a pedir el area
+        area = int(area)#Convertir el area de texto a entero
+        encontrado = False#Suponer que el area todavia no esta registrada
+        for dato in areas:#Recorrer las areas registradas
+            if dato[0] == area:#Comparar el codigo del area
+                print("Nombre del area:",dato[1])
+                encontrado = True#El area si existe
+                break#Dejar de buscar
+            if encontrado == False:#Si no encontro el area
+                print("ESTA ÁREA NO ESTÁ REGISTRADA, NO SE PUEDE SELECCIONAR")
+                continue#Volver a pedir el area
+        while True:#Pedir el tipo de telefono hasta que sea valido
+            tipo = input("Tipo de teléfono por omisión (M/C/T/O): ")
+            if tipo == "M" or tipo == "m":#M o m significa movil
+                print("Móvil")
+                break
+            elif tipo == "C" or tipo == "c":#C o c significa casa
+                print("Casa")
+                break
+            elif tipo == "T" or tipo == "t":#T o t significa trabajo
+                print("Trabajo")
+                break
+            elif tipo == "O" or tipo == "o":#O o o significa otro
+                print("Otro")
+                break
+            else:
+                print("ESTE TIPO DE TELÉFONO NO EXISTE, NO SE PUEDE SELECCIONAR")
+        if tipo == "m":#Convertir las letras minusculas a mayusculas
+            tipo = "M"
+        elif tipo == "c":
+            tipo = "C"
+        elif tipo == "t":
+            tipo = "T"
+        elif tipo == "o":
+            tipo = "O"
+        while True:#Pedir confirmacion antes de guardar
+            opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
+            if opcion == "A" or opcion == "a":#Si acepta guardar la configuracion
+                configuracion.clear()#Quitar la configuracion anterior
+                configuracion.append((area, tipo))#Guardar el area y el tipo de telefono
+                print("Configuración aceptada")
+                return#Regresar al menu principal
+            elif opcion == "C" or opcion == "c":#Si cancela no guardar los cambios
+                print("Configuración cancelada")
+                return#Regresar al menu principal
+            else:
+                print("Ingrese A o C")#Si pone otra cosa pedir de nuevo
+
+
+
 #Funcion principal
 #Lista digital de contactos
+                
 def principal():
-    areas = [] 
+    areas = []
+    configuracion = []
     TIPOS_TELEFONO = ("M", "Móvil", "C", "Casa", "T", "Trabajo", "O", "Otro")
     while True:
         print("     LISTA DIGITAL DE CONTACTOS")#Haciendo lo mas parecido a lo que esta en el pdf posible
@@ -213,7 +277,7 @@ def principal():
             case "1":
                 registrar_areas(areas) 
             case "2":
-                print("Llamar a la función para: 2. Configuración de lista de contactos")
+                configurar_lista_contactos(areas,configuracion)
             case "0":
                 break
             case _:
