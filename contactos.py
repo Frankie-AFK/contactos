@@ -306,64 +306,79 @@ def agregar_contactos(contactos, areas, configuracion):
                 print("Primero debe configurar el tipo de teléfono por omisión")
                 continue
             tipo = configuracion[0][1]
-            if tipo == "m":
-                tipo = "M"
-            elif tipo == "c":
-                tipo = "C"
-            elif tipo == "t":
-                tipo = "T"
-            elif tipo == "o":
-                tipo = "O"
-            if tipo != "M" and tipo != "C" and tipo != "T" and tipo != "O":
-                print("ESTE TIPO DE TELÉFONO NO EXISTE, NO SE PUEDE SELECCIONAR")
-                continue
-            nombre = input("Nombre del contacto: ") #Pedir el nombre del contacto
-            if len(nombre) < 1 or len(nombre) > 50: #Verificar que tenga entre 1 y 50 caracteres
-                print("El nombre debe tener entre 1 y 50 caracteres")
-                continue #Volver a pedir los datos
-            correo = input("Correo electrónico: ") #Pedir el correo del contacto
-            if correo.count("@") != 1: #Verificar que tenga exactamente un @
-                print("El correo debe tener el formato parte1@parte2")
-                continue
-            partes = correo.split("@") #Separar el correo en dos partes
-            if partes[0] == "" or partes[1] == "": #Verificar que ninguna parte este vacia
-                print("El correo debe tener texto antes y despues del @")
-                continue
-            if " " in correo: #Verificar que no tenga espacios
-                print("El correo no puede contener espacios")
-                continue
-            direccion = input("Dirección física: ") #Pedir la dirección del contacto
-            if len(direccion) > 80: #Verificar que no supere los 80 caracteres
-                print("La dirección no puede superar los 80 caracteres")
-                continue
-            fecha = input("Fecha de nacimiento (dd/mm/aaaa, Enter si no se conoce): ") #Pedir la fecha de nacimiento
-            if fecha == "": #Si no conoce la fecha y presiona Enter
-                fecha = 0 #Guardar 0 cuando no se conoce la fecha
-            else: #Si el usuario escribió una fecha
-                
-                try: #Intentar comprobar si la fecha es válida
-                    partes_fecha = fecha.split("/") #Separar dia, mes y año
-                    if len(partes_fecha) != 3: #Verificar que tenga tres partes
-                        print("El formato de la fecha no es válido")
-                        continue
-                    if len(partes_fecha[0]) != 2 or len(partes_fecha[1]) != 2 or len(partes_fecha[2]) != 4: #Verificar dd/mm/aaaa
-                        print("La fecha debe tener el formato dd/mm/aaaa")
-                        continue
-                    if not partes_fecha[0].isdigit() or not partes_fecha[1].isdigit() or not partes_fecha[2].isdigit(): #Verificar que dia, mes y año sean numeros
-                        print("La fecha debe contener solo números")
-                        continue
-                    if partes_fecha[2] == "0000": #Si no se conoce el año
-                        fecha_validar = partes_fecha[0] + "/" + partes_fecha[1] + "/2000"
-                    else: #Si se conoce el año
-                        fecha_validar = fecha
-                    datetime.strptime(fecha_validar, "%d/%m/%Y") #Comprobar si la fecha es válida
-                except ValueError: #Si la fecha no es válida
-                    print("La fecha de nacimiento no es válida")
+        if tipo == "m":
+            tipo = "M"
+        elif tipo == "c":
+            tipo = "C"
+        elif tipo == "t":
+            tipo = "T"
+        elif tipo == "o":
+            tipo = "O"
+        if tipo != "M" and tipo != "C" and tipo != "T" and tipo != "O":
+             print("ESTE TIPO DE TELÉFONO NO EXISTE, NO SE PUEDE SELECCIONAR")
+             continue
+        nombre = input("Nombre del contacto: ") #Pedir el nombre del contacto
+        if len(nombre) < 1 or len(nombre) > 50: #Verificar que tenga entre 1 y 50 caracteres
+            print("El nombre debe tener entre 1 y 50 caracteres")
+            continue #Volver a pedir los datos
+        correo = input("Correo electrónico: ") #Pedir el correo del contacto
+        if correo.count("@") != 1: #Verificar que tenga exactamente un @
+            print("El correo debe tener el formato parte1@parte2")
+            continue
+        partes = correo.split("@") #Separar el correo en dos partes
+        if partes[0] == "" or partes[1] == "": #Verificar que ninguna parte este vacia
+            print("El correo debe tener texto antes y despues del @")
+            continue
+        if " " in correo: #Verificar que no tenga espacios
+            print("El correo no puede contener espacios")
+            continue
+        direccion = input("Dirección física: ") #Pedir la dirección del contacto
+        if len(direccion) > 80: #Verificar que no supere los 80 caracteres
+            print("La dirección no puede superar los 80 caracteres")
+            continue
+        fecha = input("Fecha de nacimiento (dd/mm/aaaa, Enter si no se conoce): ") #Pedir la fecha de nacimiento
+        if fecha == "": #Si no conoce la fecha y presiona Enter
+            fecha = 0 #Guardar 0 cuando no se conoce la fecha
+        else: #Si el usuario escribió una fecha
+            try: #Intentar comprobar si la fecha es válida
+                partes_fecha = fecha.split("/") #Separar dia, mes y año
+                if len(partes_fecha) != 3: #Verificar que tenga tres partes
+                    print("El formato de la fecha no es válido")
                     continue
-                pasatiempos = input("Pasatiempos: ") #Pedir los pasatiempos del contacto
-                if len(pasatiempos) > 60: #Verificar que no supere los 60 caracteres
-                    print("Los pasatiempos no pueden superar los 60 caracteres")
+                if len(partes_fecha[0]) != 2 or len(partes_fecha[1]) != 2 or len(partes_fecha[2]) != 4: #Verificar dd/mm/aaaa
+                    print("La fecha debe tener el formato dd/mm/aaaa")
                     continue
+                if not partes_fecha[0].isdigit() or not partes_fecha[1].isdigit() or not partes_fecha[2].isdigit(): #Verificar que dia, mes y año sean numeros
+                    print("La fecha debe contener solo números")
+                    continue
+                if partes_fecha[2] == "0000": #Si no se conoce el año
+                    fecha_validar = partes_fecha[0] + "/" + partes_fecha[1] + "/2000"
+                else: #Si se conoce el año
+                    fecha_validar = fecha
+                datetime.strptime(fecha_validar, "%d/%m/%Y") #Comprobar si la fecha es válida
+            except ValueError: #Si la fecha no es válida
+                print("La fecha de nacimiento no es válida")
+                continue
+            pasatiempos = input("Pasatiempos: ") #Pedir los pasatiempos del contacto
+            if len(pasatiempos) > 60: #Verificar que no supere los 60 caracteres
+                print("Los pasatiempos no pueden superar los 60 caracteres")
+                continue
+            notas = input("Notas: ") #Pedir las notas del contacto
+            if len(notas) > 60: #Verificar que no supere los 60 caracteres
+                print("Las notas no pueden superar los 60 caracteres")
+                continue
+            while True: #Pedir confirmacion hasta que sea valida
+                opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
+                if opcion == "A" or opcion == "a":
+                    print("Contacto aceptado")
+                    break
+                elif opcion == "C" or opcion == "c":
+                    print("Registro cancelado")
+                    return
+                else:
+                    print("Ingrese A o C")
+        contactos.append([telefono, area, tipo, nombre, correo, direccion, fecha, pasatiempos, notas]) #Guardar el contacto en la lista
+        print("Contacto registrado correctamente")
             
             
 
