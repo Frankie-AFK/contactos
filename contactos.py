@@ -1,3 +1,5 @@
+from datetime import datetime#Importar datetime para validar fechas
+
 #Opcion 1 agregar areas
 #Estructura de como es Ejemplo de una posible lista areas: [ (506, “Costa Rica”), (47, “Noruega”), (502, “Guatemala”) ]
 
@@ -211,9 +213,9 @@ def configurar_lista_contactos(areas,configuracion):
                 print("Nombre del area:",dato[1])
                 encontrado = True#El area si existe
                 break#Dejar de buscar
-            if encontrado == False:#Si no encontro el area
-                print("ESTA ÁREA NO ESTÁ REGISTRADA, NO SE PUEDE SELECCIONAR")
-                continue#Volver a pedir el area
+        if encontrado == False:#Si no encontro el area
+            print("ESTA ÁREA NO ESTÁ REGISTRADA, NO SE PUEDE SELECCIONAR")
+            continue#Volver a pedir el area
         while True:#Pedir el tipo de telefono hasta que sea valido
             tipo = input("Tipo de teléfono por omisión (M/C/T/O): ")
             if tipo == "M" or tipo == "m":#M o m significa movil
@@ -261,7 +263,6 @@ def agregar_contactos(contactos, areas, configuracion):
         print()
         print("REGISTRAR CONTACTOS: AGREGAR")
         print()
-
         telefono = input("Teléfono (C para cancelar): ")
         if telefono == "C" or telefono == "c":
             break
@@ -277,38 +278,34 @@ def agregar_contactos(contactos, areas, configuracion):
             if dato[0] == telefono: #Comparar los numeros de telefono
                 repetido = True #El telefono ya existe
                 break #Dejar de buscar
-            if repetido == True: #Si el telefono ya esta registrado
-                print("ESTE TELÉFONO YA ESTÁ REGISTRADO")
-                continue #Volver a pedir el telefono
-            area = input("Área (Enter para usar área por omisión): ")
-            if area == "":
-                if len(configuracion) == 0:
-                    print("Primero debe configurar el área por omisión")
-                    continue
-                area = configuracion[0][0]
+        if repetido == True: #Si el telefono ya esta registrado
+            print("ESTE TELÉFONO YA ESTÁ REGISTRADO")
+            continue #Volver a pedir el telefono
+        area = input("Área (Enter para usar área por omisión): ")
+        if area == "":
+            if len(configuracion) == 0:
+                print("Primero debe configurar el área por omisión")
+                continue
+            area = configuracion[0][0]
         if not str(area).isdigit(): #Verificar que el area sea un numero
             print("El área debe ser un número")
             continue
-
         area = int(area) #Convertir el area a entero
         encontrado = False #Suponer que el area no existe
-
         for dato in areas: #Recorrer las areas registradas
             if dato[0] == area: #Comparar los codigos
                 encontrado = True #El area existe
                 print("Nombre del área:", dato[1])
                 break
-
         if encontrado == False: #Si el area no esta registrada
             print("ESTA ÁREA NO ESTÁ REGISTRADA, NO SE PUEDE SELECCIONAR")
             continue
-            tipo = input("Tipo de teléfono (M/C/T/O, Enter por omisión): ")
-            if tipo == "":
-                if len(configuracion) == 0:
-                    print("Primero debe configurar el tipo de teléfono por omisión")
-                    continue
-                tipo = configuracion[0][1]
-            
+        tipo = input("Tipo de teléfono (M/C/T/O, Enter por omisión): ")
+        if tipo == "":
+            if len(configuracion) == 0:
+                print("Primero debe configurar el tipo de teléfono por omisión")
+                continue
+            tipo = configuracion[0][1]
             if tipo == "m":
                 tipo = "M"
             elif tipo == "c":
@@ -325,20 +322,50 @@ def agregar_contactos(contactos, areas, configuracion):
                 print("El nombre debe tener entre 1 y 50 caracteres")
                 continue #Volver a pedir los datos
             correo = input("Correo electrónico: ") #Pedir el correo del contacto
-
             if correo.count("@") != 1: #Verificar que tenga exactamente un @
                 print("El correo debe tener el formato parte1@parte2")
                 continue
-
             partes = correo.split("@") #Separar el correo en dos partes
-
             if partes[0] == "" or partes[1] == "": #Verificar que ninguna parte este vacia
                 print("El correo debe tener texto antes y despues del @")
                 continue
-
             if " " in correo: #Verificar que no tenga espacios
                 print("El correo no puede contener espacios")
                 continue
+            direccion = input("Dirección física: ") #Pedir la dirección del contacto
+            if len(direccion) > 80: #Verificar que no supere los 80 caracteres
+                print("La dirección no puede superar los 80 caracteres")
+                continue
+            fecha = input("Fecha de nacimiento (dd/mm/aaaa, Enter si no se conoce): ") #Pedir la fecha de nacimiento
+            if fecha == "": #Si no conoce la fecha y presiona Enter
+                fecha = 0 #Guardar 0 cuando no se conoce la fecha
+            else: #Si el usuario escribió una fecha
+                
+                try: #Intentar comprobar si la fecha es válida
+                    partes_fecha = fecha.split("/") #Separar dia, mes y año
+                    if len(partes_fecha) != 3: #Verificar que tenga tres partes
+                        print("El formato de la fecha no es válido")
+                        continue
+                    if len(partes_fecha[0]) != 2 or len(partes_fecha[1]) != 2 or len(partes_fecha[2]) != 4: #Verificar dd/mm/aaaa
+                        print("La fecha debe tener el formato dd/mm/aaaa")
+                        continue
+                    if not partes_fecha[0].isdigit() or not partes_fecha[1].isdigit() or not partes_fecha[2].isdigit(): #Verificar que dia, mes y año sean numeros
+                        print("La fecha debe contener solo números")
+                        continue
+                    if partes_fecha[2] == "0000": #Si no se conoce el año
+                        fecha_validar = partes_fecha[0] + "/" + partes_fecha[1] + "/2000"
+                    else: #Si se conoce el año
+                        fecha_validar = fecha
+                    datetime.strptime(fecha_validar, "%d/%m/%Y") #Comprobar si la fecha es válida
+                except ValueError: #Si la fecha no es válida
+                    print("La fecha de nacimiento no es válida")
+                    continue
+                pasatiempos = input("Pasatiempos: ") #Pedir los pasatiempos del contacto
+                if len(pasatiempos) > 60: #Verificar que no supere los 60 caracteres
+                    print("Los pasatiempos no pueden superar los 60 caracteres")
+                    continue
+            
+            
 
 
 
