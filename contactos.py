@@ -636,7 +636,55 @@ def agregar_grupos(grupos, contactos_por_grupo):
                 
 
 
-
+#Opcion 2 Agregar contactos a los grupos
+                
+def agregar_contactos_grupos(grupos, contactos_por_grupo, contactos):
+    while True:
+        print("LISTA DIGITAL DE CONTACTOS")
+        print()
+        print("ADMINISTRAR GRUPOS DE CONTACTOS")
+        print("Agregar contactos a los grupos")
+        print()
+        nombre = input("Nombre del grupo (C para cancelar): ")
+        if nombre == "C" or nombre == "c":
+            return
+        if nombre not in grupos: #Verificar si el grupo existe
+            print("ESTE GRUPO NO EXISTE, NO PUEDE AGREGARLE CONTACTOS")
+            continue
+        indice = grupos.index(nombre) #Buscar la posicion del grupo
+        telefono = input("Teléfono: ")
+        area = input("Área: ")
+        if not telefono.isdigit() or not area.isdigit(): #Verificar que sean numeros
+            print("EL TELÉFONO Y EL ÁREA DEBEN SER NUMÉRICOS")
+            continue
+        if len(telefono) < 5 or len(telefono) > 12: #Verificar la cantidad de digitos
+            print("EL TELÉFONO DEBE TENER ENTRE 5 Y 12 DÍGITOS")
+            continue
+        telefono = int(telefono) #Convertir el telefono a entero
+        area = int(area) #Convertir el area a entero
+        encontrado = False #Indicar si encontramos el contacto
+        for contacto in contactos: #Recorrer la lista de contactos
+            if contacto[0] == telefono and contacto[1] == area:
+                encontrado = True
+                print("Nombre contacto:", contacto[3])
+                break
+        if encontrado == False: #Si el contacto no esta registrado
+            print("ESTE CONTACTO NO EXISTE, NO PUEDE AGREGARLO AL GRUPO")
+            continue
+        if (telefono, area) in contactos_por_grupo[indice]: #Verificar si ya esta en el grupo
+            print("ESTE CONTACTO YA ESTÁ AGREGADO AL GRUPO")
+            continue
+        while True: #Pedir confirmacion hasta que sea valida
+            opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
+            if opcion == "A" or opcion == "a": #Si acepta agregar el contacto
+                contactos_por_grupo[indice].append((telefono, area))
+                print("Contacto agregado al grupo correctamente")
+                break
+            elif opcion == "C" or opcion == "c": #Si cancela la operacion
+                print("Operacion cancelada")
+                break
+            else: #Si escribe una opcion incorrecta
+                print("Ingrese A o C")
 
 
 
@@ -671,6 +719,8 @@ def administrar_grupos(grupos, contactos_por_grupo, contactos):
         opcion = input("OPCIÓN: ")
         if opcion == "1":
             agregar_grupos(grupos, contactos_por_grupo)
+        if opcion == "2":
+            agregar_contactos_grupos(grupos, contactos_por_grupo, contactos)
         elif opcion == "0":
             break
 
