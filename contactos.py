@@ -604,6 +604,101 @@ def registrar_contactos(contactos, areas, configuracion):#Funcion para mostrar e
                 print("ESTA OPCIÓN NO EXISTE")
 
     
+
+#Opcion 1 Agregar grupos
+                
+def agregar_grupos(grupos, contactos_por_grupo):
+    while True:
+        print("LISTA DIGITAL DE CONTACTOS")
+        print("ADMINISTRAR GRUPOS DE CONTACTOS")
+        print("Agregar grupos")
+        nombre = input("Nombre del grupo (C para cancelar): ")
+        if nombre == "C" or nombre == "c":
+            return
+        if len(nombre) < 1 or len(nombre) > 40:
+            print("EL NOMBRE DEL GRUPO DEBE TENER ENTRE 1 Y 40 CARACTERES")
+            continue#Volver a pedir el nombre del grupo
+        if nombre in grupos:#Verificar si el grupo ya esta registrado
+            print("ESTE GRUPO YA ESTÁ REGISTRADO, NO SE PUEDE AGREGAR")
+            continue
+        while True:#Pedir confirmacion hasta que sea valida
+            opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
+            if opcion == "A" or opcion == "a":#Si acepta agregar el grupo
+                grupos.append(nombre)#Guardar el nombre del grupo
+                contactos_por_grupo.append([])#Crear una lista vacia para los contactos del grupo
+                print("Grupo registrado correctamente")
+                break
+            elif opcion == "C" or opcion == "c":#Si cancela la operacion
+                print("Registro cancelado")
+                break
+            else:#Si escribe una opcion incorrecta
+                print("Ingrese A o C")
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#4. Administrar grupos de contactos
+
+def administrar_grupos(grupos, contactos_por_grupo, contactos):
+    while True:
+        print("LISTA DIGITAL DE CONTACTOS")
+        print()
+        print("ADMINISTRAR GRUPOS DE CONTACTOS")
+        print("1. Agregar grupos")
+        print("2. Agregar contactos a los grupos")
+        print("3. Modificar grupos")
+        print("4. Eliminar grupos")
+        print("5. Eliminar contactos de los grupos")
+        print("0. Fin")
+        opcion = input("OPCIÓN: ")
+        if opcion == "1":
+            agregar_grupos(grupos, contactos_por_grupo)
+        elif opcion == "0":
+            break
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 
 #Funcion principal
 #Lista digital de contactos
@@ -612,6 +707,8 @@ def principal():
     areas = []
     configuracion = []
     contactos = []
+    grupos = []
+    contactos_por_grupo = []
     TIPOS_TELEFONO = ("M", "Móvil", "C", "Casa", "T", "Trabajo", "O", "Otro")
     while True:
         print("     LISTA DIGITAL DE CONTACTOS")#Haciendo lo mas parecido a lo que esta en el pdf posible
@@ -633,6 +730,8 @@ def principal():
                 configurar_lista_contactos(areas,configuracion)
             case "3":
                 registrar_contactos(contactos, areas, configuracion)
+            case "4":
+                administrar_grupos(grupos, contactos_por_grupo, contactos)
             case "0":
                 break
             case _:
