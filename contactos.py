@@ -382,7 +382,54 @@ def agregar_contactos(contactos, areas, configuracion):
             
             
 
+#Opcion 2 Consultar Contactos
 
+def consultar_contactos(contactos):
+    if len(contactos) == 0:
+        print("NO HAY CONTACTOS REGISTRADOS")
+        return
+    while True:#Permitir consultar varios contactos
+        print("LISTA DIGITAL DE CONTACTOS")
+        print()
+        print("REGISTRAR CONTACTOS: CONSULTAR")
+        print()
+        telefono = input("Teléfono: ") #Pedir el numero de telefono
+        if telefono == "C" or telefono == "c": #Regresar al menu anterior
+            return
+        area = input("Área: ") #Pedir el codigo de area
+        if not telefono.isdigit() or not area.isdigit(): #Verificar que sean numeros
+            print("EL TELÉFONO Y EL ÁREA DEBEN SER NUMÉRICOS")
+            continue
+        if len(telefono) < 5 or len(telefono) > 12: #Validar cantidad de digitos
+            print("EL TELÉFONO DEBE TENER ENTRE 5 Y 12 DÍGITOS")
+            continue
+        telefono = int(telefono)
+        area = int(area)
+        encontrado = False #Indicar si encontramos el contacto
+        for contacto in contactos: #Recorrer la lista de contactos
+            if contacto[0] == telefono and contacto[1] == area:
+                encontrado = True
+                break
+        if encontrado == False:
+            print("ESTE CONTACTO NO ESTA REGISTRADO, NO SE PUEDE CONSULTAR")
+            continue
+        print("DATOS DEL CONTACTO")
+        print("Teléfono:", contacto[0])
+        print("Área:", contacto[1])
+        print("Tipo de teléfono:", contacto[2])
+        print("Nombre:", contacto[3])
+        print("Correo electrónico:", contacto[4])
+        print("Dirección física:", contacto[5])
+        print("Fecha de nacimiento:", contacto[6])
+        print("Pasatiempos:", contacto[7])
+        print("Notas:", contacto[8])
+        while True: #Esperar que el usuario acepte la consulta
+            opcion = input("OPCIÓN A-ACEPTAR: ")
+            if opcion == "A" or opcion == "a":
+                break
+            else:
+                print("Ingrese A para aceptar")
+        
 
 
 
@@ -411,7 +458,7 @@ def registrar_contactos(contactos, areas, configuracion):#Funcion para mostrar e
             case "1":#Opcion para agregar contactos
                 agregar_contactos(contactos, areas, configuracion)
             case "2":#Opcion para consultar contactos
-                print("Consultar contactos")
+                consultar_contactos(contactos)
             case "3":#Opcion para modificar contactos
                 print("Modificar contactos")
             case "4":#Opcion para eliminar contactos
