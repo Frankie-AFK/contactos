@@ -526,16 +526,53 @@ def modificar_contactos(contactos):
             if nuevas_notas != "":
                 contacto[8] = nuevas_notas
             print("Contacto modificado correctamente")
+
+
+
+#Opcion 4 Eliminar Contactos
+
+def eliminar_contactos(contactos):
+    if len(contactos) == 0:
+        print("NO HAY CONTACTOS REGISTRADOS")
+        return
+    while True:#Permitir eliminar varios contactos
+        print("LISTA DIGITAL DE CONTACTOS")
+        print()
+        print("REGISTRAR CONTACTOS: ELIMINAR")
+        print()
+        telefono = input("Teléfono (C para cancelar): ")
+        if telefono == "C" or telefono == "c":
+            return
+        area = input("Área: ")
+        if not telefono.isdigit() or not area.isdigit():
+            print("EL TELÉFONO Y EL ÁREA DEBEN SER NUMÉRICOS")
+            continue
+        if len(telefono) < 5 or len(telefono) > 12:
+            print("EL TELÉFONO DEBE TENER ENTRE 5 Y 12 DÍGITOS")
+            continue
+        telefono = int(telefono)
+        area = int(area)
+        encontrado = False#Indicar si encontramos el contacto
+        for contacto in contactos:#Recorrer la lista de contactos
+            if contacto[0] == telefono and contacto[1] == area:
+                encontrado = True
+                break
+        if encontrado == False:
+            print("ESTE CONTACTO NO ESTÁ REGISTRADO, NO SE PUEDE ELIMINAR")
+            continue
+        while True:#Confirmar si desea eliminar el contacto
+            opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
+            if opcion == "A" or opcion == "a":
+                contactos.remove(contacto)
+                print("Contacto eliminado correctamente")
+                break
+            elif opcion == "C" or opcion == "c":
+                print("Eliminación cancelada")
+                break
+            else:
+                print("Ingrese A o C")
+                continue
                         
-                
-
-
-
-
-
-
-
-
 
                 
 #3.Registrar contactos
@@ -560,7 +597,7 @@ def registrar_contactos(contactos, areas, configuracion):#Funcion para mostrar e
             case "3":#Opcion para modificar contactos
                 modificar_contactos(contactos)
             case "4":#Opcion para eliminar contactos
-                print("Eliminar contactos")
+                eliminar_contactos(contactos)
             case "0":#Regresar al menu principal
                 break
             case _:#Si el usuario escribe una opcion que no existe
