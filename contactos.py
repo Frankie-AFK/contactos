@@ -781,11 +781,48 @@ def eliminar_grupos(grupos, contactos_por_grupo):
 
 
 
+#Opcion 5 Eliminar contactos de los grupos
 
-
-
-
-
+def eliminar_contactos_grupos(grupos, contactos_por_grupo, contactos):
+    while True:
+        print("LISTA DIGITAL DE CONTACTOS")
+        print()
+        print("ADMINISTRAR GRUPOS DE CONTACTOS")
+        print("Eliminar contactos de los grupos")
+        print()
+        nombre = input("Nombre del grupo (C para cancelar): ")
+        if nombre == "C" or nombre == "c":
+            return
+        if nombre not in grupos: #Verificar si el grupo existe
+            print("ESTE GRUPO NO EXISTE, NO PUEDE ELIMINARLE CONTACTOS")
+            continue
+        indice = grupos.index(nombre) #Buscar la posicion del grupo
+        telefono = input("Teléfono: ")
+        area = input("Área: ")
+        if not telefono.isdigit() or not area.isdigit(): #Verificar que sean numeros
+            print("EL TELÉFONO Y EL ÁREA DEBEN SER NUMÉRICOS")
+            continue
+        telefono = int(telefono) #Convertir el telefono a entero
+        area = int(area) #Convertir el area a entero
+        if (telefono, area) not in contactos_por_grupo[indice]: #Verificar si pertenece al grupo
+            print("ESTE CONTACTO NO EXISTE EN EL GRUPO, NO PUEDE ELIMINARLO")
+            continue
+        for contacto in contactos:
+            if contacto[0] == telefono and contacto[1] == area:
+                print("Nombre contacto:", contacto[3])
+                break
+        while True: #Pedir confirmacion hasta que sea valida
+            opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
+            if opcion == "A" or opcion == "a":
+                contactos_por_grupo[indice].remove((telefono, area))
+                print("Contacto eliminado del grupo correctamente")
+                break
+            elif opcion == "C" or opcion == "c":
+                print("Eliminación cancelada")
+                break
+            else:
+                print("Ingrese A o C")
+    
 
 
 #4. Administrar grupos de contactos
@@ -810,6 +847,8 @@ def administrar_grupos(grupos, contactos_por_grupo, contactos):
             modificar_grupos(grupos, contactos_por_grupo)
         elif opcion == "4":
             eliminar_grupos(grupos, contactos_por_grupo)
+        elif opcion == "5":
+            eliminar_contactos_grupos(grupos, contactos_por_grupo, contactos)
         elif opcion == "0":
             break
 
