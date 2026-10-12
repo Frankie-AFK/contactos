@@ -648,47 +648,105 @@ def agregar_contactos_grupos(grupos, contactos_por_grupo, contactos):
         nombre = input("Nombre del grupo (C para cancelar): ")
         if nombre == "C" or nombre == "c":
             return
-        if nombre not in grupos: #Verificar si el grupo existe
+        if nombre not in grupos:#Verificar si el grupo existe
             print("ESTE GRUPO NO EXISTE, NO PUEDE AGREGARLE CONTACTOS")
             continue
-        indice = grupos.index(nombre) #Buscar la posicion del grupo
+        indice = grupos.index(nombre)#Buscar la posicion del grupo
         telefono = input("Teléfono: ")
         area = input("Área: ")
-        if not telefono.isdigit() or not area.isdigit(): #Verificar que sean numeros
+        if not telefono.isdigit() or not area.isdigit():#Verificar que sean numeros
             print("EL TELÉFONO Y EL ÁREA DEBEN SER NUMÉRICOS")
             continue
-        if len(telefono) < 5 or len(telefono) > 12: #Verificar la cantidad de digitos
+        if len(telefono) < 5 or len(telefono) > 12:#Verificar la cantidad de digitos
             print("EL TELÉFONO DEBE TENER ENTRE 5 Y 12 DÍGITOS")
             continue
-        telefono = int(telefono) #Convertir el telefono a entero
-        area = int(area) #Convertir el area a entero
-        encontrado = False #Indicar si encontramos el contacto
-        for contacto in contactos: #Recorrer la lista de contactos
+        telefono = int(telefono)#Convertir el telefono a entero
+        area = int(area)#Convertir el area a entero
+        encontrado = False#Indicar si encontramos el contacto
+        for contacto in contactos:#Recorrer la lista de contactos
             if contacto[0] == telefono and contacto[1] == area:
                 encontrado = True
                 print("Nombre contacto:", contacto[3])
                 break
-        if encontrado == False: #Si el contacto no esta registrado
+        if encontrado == False:#Si el contacto no esta registrado
             print("ESTE CONTACTO NO EXISTE, NO PUEDE AGREGARLO AL GRUPO")
             continue
-        if (telefono, area) in contactos_por_grupo[indice]: #Verificar si ya esta en el grupo
+        if (telefono, area) in contactos_por_grupo[indice]:#Verificar si ya esta en el grupo
             print("ESTE CONTACTO YA ESTÁ AGREGADO AL GRUPO")
             continue
-        while True: #Pedir confirmacion hasta que sea valida
+        while True:#Pedir confirmacion hasta que sea valida
             opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
-            if opcion == "A" or opcion == "a": #Si acepta agregar el contacto
+            if opcion == "A" or opcion == "a":#Si acepta agregar el contacto
                 contactos_por_grupo[indice].append((telefono, area))
                 print("Contacto agregado al grupo correctamente")
                 break
-            elif opcion == "C" or opcion == "c": #Si cancela la operacion
+            elif opcion == "C" or opcion == "c":#Si cancela la operacion
                 print("Operacion cancelada")
                 break
-            else: #Si escribe una opcion incorrecta
+            else:#Si escribe una opcion incorrecta
                 print("Ingrese A o C")
 
 
 
+#Opcion 3 Modificar grupos
 
+def modificar_grupos(grupos, contactos_por_grupo):
+    while True:
+        print("LISTA DIGITAL DE CONTACTOS")
+        print()
+        print("ADMINISTRAR GRUPOS DE CONTACTOS")
+        print("Modificar grupos")
+        print()
+        nombre = input("Nombre del grupo (C para cancelar): ")
+        if nombre == "C" or nombre == "c":
+            return
+        if nombre not in grupos:#Verificar si el grupo existe
+            print("GRUPO NO ESTÁ REGISTRADO, NO SE PUEDE MODIFICAR")
+            continue
+        indice = grupos.index(nombre)#Buscar la posicion del grupo
+        nuevo_nombre = input("MODIFICACIÓN (Enter para mantener): ")#Pedir el nuevo nombre
+        if nuevo_nombre == "":#Si no escribe nada, mantener el nombre actual
+            nuevo_nombre = nombre
+        if len(nuevo_nombre) > 40:#Verificar el limite de caracteres
+            print("EL NOMBRE DEL GRUPO NO PUEDE SUPERAR 40 CARACTERES")
+            continue
+        if nuevo_nombre in grupos and nuevo_nombre != nombre:#Verificar si el nuevo grupo ya existe
+            print("GRUPO YA EXISTE, EN CASO DE ACEPTAR LA OPERACIÓN LOS CONTACTOS SE LE AGREGARÁN")
+            while True:#Pedir confirmacion si el grupo ya existe
+                opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
+                if opcion == "A" or opcion == "a":
+                    break
+                elif opcion == "C" or opcion == "c":
+                    print("Modificación cancelada")
+                    break
+                else:
+                    print("Ingrese A o C")
+            if opcion == "C" or opcion == "c":#Si cancela, volver a pedir el grupo
+                continue
+        if nuevo_nombre not in grupos:#Si el nuevo nombre no existe, cambiar el nombre
+            while True:#Pedir confirmacion hasta que sea valida
+                opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
+                if opcion == "A" or opcion == "a":
+                    grupos[indice] = nuevo_nombre#Guardar el nuevo nombre del grupo
+                    print("Grupo modificado correctamente")
+                    break
+                elif opcion == "C" or opcion == "c":
+                    print("Modificación cancelada")
+                    break
+                else:
+                    print("Ingrese A o C")
+                if opcion == "C" or opcion == "c":
+                    continue
+        elif nuevo_nombre == nombre:
+            print("El nombre del grupo se mantiene igual")
+        elif nuevo_nombre != nombre:#Si el grupo ya existe, unir los contactos
+            nuevo_indice = grupos.index(nuevo_nombre)#Buscar la posicion del grupo nuevo
+            for contacto in contactos_por_grupo[indice]:#Recorrer los contactos del grupo anterior
+                if contacto not in contactos_por_grupo[nuevo_indice]:#Evitar contactos repetidos
+                    contactos_por_grupo[nuevo_indice].append(contacto)#Agregar el contacto al nuevo grupo
+            grupos.pop(indice)#Eliminar el grupo anterior
+            contactos_por_grupo.pop(indice)#Eliminar su lista de contactos
+            print("Grupo modificado correctamente")
 
 
 
@@ -719,8 +777,10 @@ def administrar_grupos(grupos, contactos_por_grupo, contactos):
         opcion = input("OPCIÓN: ")
         if opcion == "1":
             agregar_grupos(grupos, contactos_por_grupo)
-        if opcion == "2":
+        elif opcion == "2":
             agregar_contactos_grupos(grupos, contactos_por_grupo, contactos)
+        elif opcion == "3":
+            modificar_grupos(grupos, contactos_por_grupo)
         elif opcion == "0":
             break
 
