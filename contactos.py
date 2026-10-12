@@ -750,7 +750,34 @@ def modificar_grupos(grupos, contactos_por_grupo):
 
 
 
+#Opcion 4 Eliminar grupos
 
+def eliminar_grupos(grupos, contactos_por_grupo):
+    while True:
+        print("LISTA DIGITAL DE CONTACTOS")
+        print()
+        print("ADMINISTRAR GRUPOS DE CONTACTOS")
+        print("Eliminar grupos")
+        print()
+        nombre = input("Nombre del grupo (C para cancelar): ")
+        if nombre == "C" or nombre == "c":
+            return
+        if nombre not in grupos:#Verificar si el grupo existe
+            print("ESTE GRUPO NO ESTÁ REGISTRADO, NO SE PUEDE ELIMINAR")
+            continue
+        indice = grupos.index(nombre)#Buscar la posicion del grupo
+        while True:#Pedir confirmacion
+            opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
+            if opcion == "A" or opcion == "a":
+                grupos.pop(indice)#Eliminar el grupo
+                contactos_por_grupo.pop(indice)#Eliminar sus contactos del grupo
+                print("Grupo eliminado correctamente")
+                break
+            elif opcion == "C" or opcion == "c":
+                print("Eliminación cancelada")
+                break
+            else:
+                print("Ingrese A o C")
 
 
 
@@ -781,6 +808,8 @@ def administrar_grupos(grupos, contactos_por_grupo, contactos):
             agregar_contactos_grupos(grupos, contactos_por_grupo, contactos)
         elif opcion == "3":
             modificar_grupos(grupos, contactos_por_grupo)
+        elif opcion == "4":
+            eliminar_grupos(grupos, contactos_por_grupo)
         elif opcion == "0":
             break
 
