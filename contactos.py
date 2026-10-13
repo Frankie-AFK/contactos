@@ -1,6 +1,8 @@
 from datetime import datetime#Importar datetime para validar fechas
+from reportlab.pdfgen import canvas  #Importar reportlab para generar archivos PDF
 
-#Opcion 1 agregar areas
+
+#Opcion 1.1 agregar areas
 #Estructura de como es Ejemplo de una posible lista areas: [ (506, “Costa Rica”), (47, “Noruega”), (502, “Guatemala”) ]
 
 def agregar_areas(areas):
@@ -45,7 +47,7 @@ def agregar_areas(areas):
 
 
 
-#Opcion 2 Consultar areas
+#Opcion 1.2 Consultar areas
                 
 def consultar_areas(areas):
     while True:
@@ -77,7 +79,7 @@ def consultar_areas(areas):
 
 
 
-#Opcion 3 modificar areas
+#Opcion 1.3 modificar areas
 
 def modificar_areas(areas):
     while True:#Repetir para permitir mas modificaciones
@@ -124,7 +126,7 @@ def modificar_areas(areas):
                         
                 
 
-#Opcion 4 eliminar areas
+#Opcion 1.4 eliminar areas
 
 def eliminar_areas(areas):
     while True:#Repetir hasta que el usuario cancele
@@ -253,7 +255,7 @@ def configurar_lista_contactos(areas,configuracion):
             
 
 
-#Opcion 1 Agregar Contactos
+#Opcion 3.1 Agregar Contactos
 
 def agregar_contactos(contactos, areas, configuracion):
     while True:
@@ -380,7 +382,7 @@ def agregar_contactos(contactos, areas, configuracion):
             
             
 
-#Opcion 2 Consultar Contactos
+#Opcion 3.2 Consultar Contactos
 
 def consultar_contactos(contactos):
     if len(contactos) == 0:
@@ -430,7 +432,7 @@ def consultar_contactos(contactos):
 
 
 
-#Opcion 3 Modificar Contactos
+#Opcion 3.3 Modificar Contactos
 
 def modificar_contactos(contactos):
     if len(contactos) == 0:
@@ -529,7 +531,7 @@ def modificar_contactos(contactos):
 
 
 
-#Opcion 4 Eliminar Contactos
+#Opcion 3.4 Eliminar Contactos
 
 def eliminar_contactos(contactos):
     if len(contactos) == 0:
@@ -605,7 +607,7 @@ def registrar_contactos(contactos, areas, configuracion):#Funcion para mostrar e
 
     
 
-#Opcion 1 Agregar grupos
+#Opcion 4.1 Agregar grupos
                 
 def agregar_grupos(grupos, contactos_por_grupo):
     while True:
@@ -636,7 +638,7 @@ def agregar_grupos(grupos, contactos_por_grupo):
                 
 
 
-#Opcion 2 Agregar contactos a los grupos
+#Opcion 4.2 Agregar contactos a los grupos
                 
 def agregar_contactos_grupos(grupos, contactos_por_grupo, contactos):
     while True:
@@ -688,7 +690,7 @@ def agregar_contactos_grupos(grupos, contactos_por_grupo, contactos):
 
 
 
-#Opcion 3 Modificar grupos
+#Opcion 4.3 Modificar grupos
 
 def modificar_grupos(grupos, contactos_por_grupo):
     while True:
@@ -750,7 +752,7 @@ def modificar_grupos(grupos, contactos_por_grupo):
 
 
 
-#Opcion 4 Eliminar grupos
+#Opcion 4.4 Eliminar grupos
 
 def eliminar_grupos(grupos, contactos_por_grupo):
     while True:
@@ -781,7 +783,7 @@ def eliminar_grupos(grupos, contactos_por_grupo):
 
 
 
-#Opcion 5 Eliminar contactos de los grupos
+#Opcion 4.5 Eliminar contactos de los grupos
 
 def eliminar_contactos_grupos(grupos, contactos_por_grupo, contactos):
     while True:
@@ -854,26 +856,137 @@ def administrar_grupos(grupos, contactos_por_grupo, contactos):
 
 
 
+#Verificar si un dato cumple con el filtro
+        
+def cumple_filtro(dato, filtro):
+    dato = str(dato).lower()#Convertir el dato a texto y minusculas
+    filtro = filtro.lower()#Convertir el filtro a minusculas
+    if filtro == "":#Si el filtro esta vacio, aceptar cualquier dato
+        return True
+    partes = filtro.split("%")#Separar el filtro donde aparece %
+    if "%" not in filtro:#Si no hay %, comparar el texto completo
+        return dato == filtro
+    posicion = 0#Posicion desde donde se empieza a buscar
+    for parte in partes:#Recorrer las partes del filtro
+        if parte == "":#Ignorar las partes vacias
+            continue
+        indice = dato.find(parte, posicion)#Buscar la parte en el dato
+        if indice == -1:#Si no se encuentra la parte
+            return False
+        posicion = indice + len(parte)#Continuar despues de la parte encontrada
+    if filtro[0] != "%":#Verificar si el filtro no empieza con %
+        if dato[:len(partes[0])] != partes[0]:#Comparar el inicio del dato con el filtro
+            return False#El inicio no coincide
+    if filtro[-1] != "%":#Verificar si el filtro no termina con %
+        if dato[-len(partes[-1]):] != partes[-1]:#Comparar el final del dato
+            return False#El final no coincide
+        if posicion != len(dato):#Verificar que la ultima parte llegue al final
+            return False
+    return True#El dato cumple con el filtro
+
+
+
+#Escribir texto en el PDF sin salir del margen
+
+def escribir_texto(pdf, texto, y):
+    palabras = str(texto).split()#Separar el texto en palabras
+    linea = ""#Guardar las palabras de cada linea
+    for palabra in palabras:#Recorrer las palabras del texto
+        prueba = linea + palabra + " "#Agregar una palabra a la linea
+        if pdf.stringWidth(prueba, "Helvetica", 14) <= 490:#Verificar si cabe
+            linea = prueba#Guardar la palabra en la linea
+        else:#Si la palabra no cabe
+            if linea != "":#Verificar que haya texto
+                pdf.drawString(50, y, linea)#Escribir la linea
+                y = y - 20#Bajar a la siguiente linea
+            linea = palabra + " "#Empezar otra linea
+    if linea != "":#Verificar si queda texto por escribir
+        pdf.drawString(50, y, linea)#Escribir la ultima linea
+        y = y - 20#Bajar a la siguiente linea
+    return y#Devolver la posicion vertical actualizada
+        
+
+
+#Generar un archivo PDF con los contactos encontrados
+
+def generar_pdf(resultados):
+    pdf = canvas.Canvas("lista_contactos.pdf")#Crear el archivo PDF
+    pdf.setFont("Helvetica", 14)#Establecer el tipo y tamaño de letra
+    pdf.drawString(50, 800, "LISTA DIGITAL DE CONTACTOS")#Escribir el titulo
+    y = 770#Posicion vertical donde empiezan los contactos
+    for contacto in resultados:#Recorrer los contactos encontrados
+        if y < 250:  #Verificar si queda espacio para otro contacto
+            pdf.showPage()  #Crear una nueva pagina
+            pdf.setFont("Helvetica", 14)  #Establecer nuevamente la letra
+            y = 800  #Volver a la parte superior de la pagina
+        y = escribir_texto(pdf, "Nombre: " + str(contacto[3]), y)  #Escribir el nombre y actualizar la posicion
+        y = escribir_texto(pdf, "Telefono: " + str(contacto[0]), y)  #Escribir el telefono y bajar de linea
+        y = escribir_texto(pdf, "Area: " + str(contacto[1]), y)  #Escribir el codigo de area y bajar de linea
+        y = escribir_texto(pdf, "Tipo: " + str(contacto[2]), y)  #Escribir el tipo de telefono
+        y = escribir_texto(pdf, "Correo: " + str(contacto[4]), y)  #Escribir el correo electronico
+        y = escribir_texto(pdf, "Direccion: " + str(contacto[5]), y)  #Escribir la direccion
+        y = escribir_texto(pdf, "Fecha de nacimiento: " + str(contacto[6]), y)  #Escribir la fecha
+        y = escribir_texto(pdf, "Pasatiempos: " + str(contacto[7]), y)  #Escribir los pasatiempos
+        y = escribir_texto(pdf, "Notas: " + str(contacto[8]), y)  #Escribir las notas
+
+        y = y - 10  #Dejar espacio antes del siguiente contacto
+    pdf.save()#Guardar el archivo PDF
 
 
 
 
 
+#5. Lista de contactos
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def lista_contactos(contactos, grupos, contactos_por_grupo):#Mostrar y filtrar los contactos
+    while True:#Repetir el menu hasta salir
+        print("LISTA DIGITAL DE CONTACTOS")
+        print()
+        print("LISTA DE CONTACTOS")
+        print()
+        print("FILTROS:")
+        nombre = input("Nombre contacto: ").lower()
+        telefono = input("Teléfono: ")
+        area = input("Área: ")
+        fecha = input("Fecha de nacimiento: ")
+        pasatiempos = input("Pasatiempos: ").lower()
+        grupo = input("Grupo: ").lower()
+        resultados = []#Guardar los contactos que cumplen los filtros
+        for contacto in contactos:#Recorrer todos los contactos
+            if not cumple_filtro(contacto[3], nombre):#Verificar el nombre
+                continue#Pasar al siguiente contacto
+            if not cumple_filtro(contacto[0], telefono):#Verificar el telefono
+                continue#Pasar al siguiente contacto
+            if not cumple_filtro(contacto[1], area):#Verificar el area
+                continue#Pasar al siguiente contacto
+            if not cumple_filtro(contacto[6], fecha):#Verificar la fecha de nacimiento
+                continue#Pasar al siguiente contacto
+            if not cumple_filtro(contacto[7], pasatiempos):#Verificar los pasatiempos
+                continue#Pasar al siguiente contacto
+            pertenece = False#Indicar si el contacto pertenece a un grupo
+            if grupo == "":#Si no hay filtro de grupo
+                pertenece = True
+            else:#Si el usuario escribio un grupo
+                for i in range(len(grupos)):#Recorrer los grupos
+                    if cumple_filtro(grupos[i], grupo):#Verificar el nombre del grupo
+                        if (contacto[0], contacto[1]) in contactos_por_grupo[i]:#Verificar si pertenece
+                            pertenece = True#El contacto pertenece al grupo
+                            break
+            if pertenece:#Verificar si el contacto cumple el filtro de grupo
+                resultados.append(contacto)#Guardar el contacto en los resultados
+        print("Contactos encontrados:", len(resultados))#Mostrar la cantidad de contactos        
+        while True:#Pedir confirmacion hasta que sea valida
+            opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
+            if opcion == "A" or opcion == "a":#Aceptar la generacion de la lista
+                print("Generando lista de contactos...")
+                generar_pdf(resultados)  #Generar el PDF con los contactos encontrados
+                break
+            elif opcion == "C" or opcion == "c":#Cancelar la operacion
+                print("Operación cancelada")
+                break
+            else:#Si la opcion no es valida
+                print("Ingrese A o C")
+        break  #Regresar al menu principal
 
 
 
@@ -910,6 +1023,8 @@ def principal():
                 registrar_contactos(contactos, areas, configuracion)
             case "4":
                 administrar_grupos(grupos, contactos_por_grupo, contactos)
+            case "5":
+                lista_contactos(contactos, grupos, contactos_por_grupo)
             case "0":
                 break
             case _:
