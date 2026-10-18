@@ -990,6 +990,26 @@ def lista_contactos(contactos, grupos, contactos_por_grupo):#Mostrar y filtrar l
 
 
 
+
+
+
+
+
+
+#7 Acerca de
+
+def acerca_de():
+    print("LISTA DIGITAL DE CONTACTOS")
+    print()
+    print("ACERCA DE")
+    print()
+    print("Nombre: Lista Digital de Contactos")
+    print("Version: 1.0")
+    print("Fecha de creacion: Octubre 2026")
+    print("Autor: Frankie Cheng Zheng")
+    input("Presione Enter para continuar...")
+
+
                 
 #Funcion principal
 #Lista digital de contactos
@@ -1025,6 +1045,9 @@ def principal():
                 administrar_grupos(grupos, contactos_por_grupo, contactos)
             case "5":
                 lista_contactos(contactos, grupos, contactos_por_grupo)
+            case "7":
+                acerca_de()
+                
             case "0":
                 break
             case _:
