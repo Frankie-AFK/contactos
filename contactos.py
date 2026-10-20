@@ -30,10 +30,12 @@ def agregar_areas(areas):
             print("ESTA ÁREA YA ESTÁ REGISTRADA, NO SE PUEDE AGREGAR")
             continue
         if repetido == False:#Si no hay repetidos
-            nombre_area = input("Nombre del área         ")#Ingresar nombre de areas
-            if len(nombre_area) < 1 or len(nombre_area) > 40:#Validar la cantidad de caracteres
-                print("Nombre del area debe ser dentro de 1 a 40 caracteres")
-                continue
+            while True:
+                nombre_area = input("Nombre del área         ")#Ingresar nombre de areas
+                if len(nombre_area) < 1 or len(nombre_area) > 40:#Validar la cantidad de caracteres
+                    print("Nombre del area debe ser dentro de 1 a 40 caracteres")
+                    continue
+                break
             while True:#Repetir la pregunta de A o C cuando poner cosas nada que ver
                 opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
                 if opcion == "A" or opcion == "a":
@@ -72,8 +74,8 @@ def consultar_areas(areas):
                         break
                     else:
                         print("Ingrese A para aceptar")
-            encontrado = True#Se encontró el área
-            break
+                encontrado = True#Se encontró el área
+                break
         if encontrado == False:#El programa valida que este código exista en la lista
             print("ESTA ÁREA NO ESTÁ REGISTRADA, NO SE PUEDE CONSULTAR")
 
@@ -120,7 +122,7 @@ def modificar_areas(areas):
                         break#Cancelar sin guardar cambios
                     else:
                         print("Ingrese A o C")
-                    break#Salir del for porque ya encontramos el area
+                break#Salir del for porque ya encontramos el area
         if encontrado == False:#Si no existe el area mostrar un mensaje
             print("ESTA ÁREA NO ESTÁ REGISTRADA, NO SE PUEDE MODIFICAR")
                         
@@ -128,7 +130,7 @@ def modificar_areas(areas):
 
 #Opcion 1.4 eliminar areas
 
-def eliminar_areas(areas):
+def eliminar_areas(areas,contactos):
     while True:#Repetir hasta que el usuario cancele
         print("LISTA DIGITAL DE CONTACTOS")
         print()
@@ -151,8 +153,27 @@ def eliminar_areas(areas):
                 while True:#Repetir hasta que ponga A o C
                     opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
                     if opcion == "A" or opcion == "a":
-                        areas.pop(i)#Eliminar el area si acepta
-                        break
+                        tiene_contactos = False
+                        for contacto in contactos:
+                            if contacto[1] == area:
+                                tiene_contactos = True
+                                break
+                        if tiene_contactos == True:
+                            print("EN ESTA ÁREA HAY CONTACTOS REGISTRADOS, NO SE PUEDE ELIMINAR")
+                            break
+                        else:
+                            while True:
+                                confirmar = input("CONFIRMA LA ELIMINACIÓN (SI/NO): ")
+                                if confirmar == "SI" or confirmar == "si":
+                                    areas.pop(i)
+                                    print("Área eliminada correctamente")
+                                    break
+                                elif confirmar == "NO" or confirmar == "no":
+                                    print("Eliminación cancelada")
+                                    break
+                                else:
+                                    print("Ingrese SI o NO")
+                            break    
                     elif opcion == "C" or opcion == "c":
                         break#Cancelar sin eliminar el area
                     else:
@@ -166,7 +187,7 @@ def eliminar_areas(areas):
 #1 Registrar areas
 #La información de las áreas está en la lista areas, donde cada elemento es una tupla que tiene: - Área (entero >= 1 y <= 999) - Nombre del área (string entre 1 y 40 caracteres)
 
-def registrar_areas(areas):
+def registrar_areas(areas,contactos):
     while True:
         print("             LISTA DIGITAL DE CONTACTOS")
         print()
@@ -185,7 +206,7 @@ def registrar_areas(areas):
             case "3":
                 modificar_areas(areas)
             case "4":
-                eliminar_areas(areas)
+                eliminar_areas(areas,contactos)
             case "0":
                 break
             case _:
@@ -273,14 +294,6 @@ def agregar_contactos(contactos, areas, configuracion):
             print("El teléfono debe tener entre 5 y 12 dígitos")
             continue
         telefono = int(telefono)#Convertir el telefono a entero
-        repetido = False#Suponer que el telefono no esta registrado
-        for dato in contactos:#Recorrer los contactos registrados
-            if dato[0] == telefono:#Comparar los numeros de telefono
-                repetido = True#El telefono ya existe
-                break#Dejar de buscar
-        if repetido == True:#Si el telefono ya esta registrado
-            print("ESTE TELÉFONO YA ESTÁ REGISTRADO")
-            continue#Volver a pedir el telefono
         area = input("Área (Enter para usar área por omisión): ")
         if area == "":
             if len(configuracion) == 0:
@@ -300,6 +313,14 @@ def agregar_contactos(contactos, areas, configuracion):
         if encontrado == False:#Si el area no esta registrada
             print("ESTA ÁREA NO ESTÁ REGISTRADA, NO SE PUEDE SELECCIONAR")
             continue
+        repetido = False
+        for dato in contactos:
+            if dato[0] == telefono and dato[1] == area:
+                repetido = True
+                break
+        if repetido == True:
+            print("ESTE TELÉFONO YA ESTÁ REGISTRADO EN ESTA ÁREA")
+            continue
         tipo = input("Tipo de teléfono (M/C/T/O, Enter por omisión): ")
         if tipo == "":
             if len(configuracion) == 0:
@@ -317,68 +338,78 @@ def agregar_contactos(contactos, areas, configuracion):
         if tipo != "M" and tipo != "C" and tipo != "T" and tipo != "O":
              print("ESTE TIPO DE TELÉFONO NO EXISTE, NO SE PUEDE SELECCIONAR")
              continue
-        nombre = input("Nombre del contacto: ")#Pedir el nombre del contacto
-        if len(nombre) < 1 or len(nombre) > 50:#Verificar que tenga entre 1 y 50 caracteres
-            print("El nombre debe tener entre 1 y 50 caracteres")
-            continue#Volver a pedir los datos
-        correo = input("Correo electrónico: ")#Pedir el correo del contacto
-        if correo.count("@") != 1:#Verificar que tenga exactamente un @
-            print("El correo debe tener el formato parte1@parte2")
-            continue
-        partes = correo.split("@")#Separar el correo en dos partes
-        if partes[0] == "" or partes[1] == "": #Verificar que ninguna parte este vacia
-            print("El correo debe tener texto antes y despues del @")
-            continue
-        if " " in correo:#Verificar que no tenga espacios
-            print("El correo no puede contener espacios")
-            continue
-        direccion = input("Dirección física: ")#Pedir la dirección del contacto
-        if len(direccion) > 80:#Verificar que no supere los 80 caracteres
-            print("La dirección no puede superar los 80 caracteres")
-            continue
-        fecha = input("Fecha de nacimiento (dd/mm/aaaa, Enter si no se conoce): ") #Pedir la fecha de nacimiento
-        if fecha == "":#Si no conoce la fecha y presiona Enter
-            fecha = 0#Guardar 0 cuando no se conoce la fecha
-        else: #Si el usuario escribió una fecha
-            try:#Intentar comprobar si la fecha es válida
-                partes_fecha = fecha.split("/")#Separar dia, mes y año
-                if len(partes_fecha) != 3:#Verificar que tenga tres partes
+        while True:
+            nombre = input("Nombre del contacto: ")
+            if len(nombre) < 1 or len(nombre) > 50:
+                print("El nombre debe tener entre 1 y 50 caracteres")
+                continue
+            break
+        while True:
+            correo = input("Correo electrónico: ")
+            if correo.count("@") != 1:
+                print("El correo debe tener el formato parte1@parte2")
+                continue
+            partes = correo.split("@")
+            if partes[0] == "" or partes[1] == "":
+                print("El correo debe tener texto antes y despues del @")
+                continue
+            if " " in correo:
+                print("El correo no puede contener espacios")
+                continue
+            break
+        while True:
+            direccion = input("Dirección física: ")
+            if len(direccion) > 80:
+                print("La dirección no puede superar los 80 caracteres")
+                continue
+            break
+        while True:
+            fecha = input("Fecha de nacimiento (dd/mm/aaaa, Enter si no se conoce): ")
+            if fecha == "":
+                fecha = 0
+                break
+            try:
+                partes_fecha = fecha.split("/")
+                if len(partes_fecha) != 3:
                     print("El formato de la fecha no es válido")
                     continue
-                if len(partes_fecha[0]) != 2 or len(partes_fecha[1]) != 2 or len(partes_fecha[2]) != 4:#Verificar dd/mm/aaaa
+                if len(partes_fecha[0]) != 2 or len(partes_fecha[1]) != 2 or len(partes_fecha[2]) != 4:
                     print("La fecha debe tener el formato dd/mm/aaaa")
                     continue
-                if not partes_fecha[0].isdigit() or not partes_fecha[1].isdigit() or not partes_fecha[2].isdigit():#Verificar que dia, mes y año sean numeros
+                if not partes_fecha[0].isdigit() or not partes_fecha[1].isdigit() or not partes_fecha[2].isdigit():
                     print("La fecha debe contener solo números")
                     continue
-                if partes_fecha[2] == "0000":#Si no se conoce el año
+                if partes_fecha[2] == "0000":
                     fecha_validar = partes_fecha[0] + "/" + partes_fecha[1] + "/2000"
-                else: #Si se conoce el año
-                    fecha_validar = fecha
-                datetime.strptime(fecha_validar, "%d/%m/%Y")#Comprobar si la fecha es válida
-            except ValueError:#Si la fecha no es válida
-                print("La fecha de nacimiento no es válida")
-                continue
-        pasatiempos = input("Pasatiempos: ")#Pedir los pasatiempos del contacto
-        if len(pasatiempos) > 60:#Verificar que no supere los 60 caracteres
-            print("Los pasatiempos no pueden superar los 60 caracteres")
-            continue
-        notas = input("Notas: ")#Pedir las notas del contacto
-        if len(notas) > 60:#Verificar que no supere los 60 caracteres
-            print("Las notas no pueden superar los 60 caracteres")
-            continue
-            while True:#Pedir confirmacion hasta que sea valida
-                opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
-                if opcion == "A" or opcion == "a":
-                    print("Contacto aceptado")
-                    break
-                elif opcion == "C" or opcion == "c":
-                    print("Registro cancelado")
-                    return
                 else:
-                    print("Ingrese A o C")
-        contactos.append([telefono, area, tipo, nombre, correo, direccion, fecha, pasatiempos, notas]) #Guardar el contacto en la lista
-        print("Contacto registrado correctamente")
+                    fecha_validar = fecha
+                datetime.strptime(fecha_validar, "%d/%m/%Y")
+                break
+            except ValueError:
+                print("La fecha de nacimiento no es válida")
+        while True:
+            pasatiempos = input("Pasatiempos: ")
+            if len(pasatiempos) > 60:
+                print("Los pasatiempos no pueden superar los 60 caracteres")
+                continue
+            break
+        while True:
+            notas = input("Notas: ")
+            if len(notas) > 60:
+                print("Las notas no pueden superar los 60 caracteres")
+                continue
+            break
+        while True:#Pedir confirmacion hasta que sea valida
+            opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
+            if opcion == "A" or opcion == "a":
+                contactos.append([telefono, area, tipo, nombre, correo, direccion, fecha, pasatiempos, notas])
+                print("Contacto registrado correctamente")
+                break
+            elif opcion == "C" or opcion == "c":
+                print("Registro cancelado")
+                break
+            else:
+                print("Ingrese A o C")
             
             
 
@@ -464,14 +495,17 @@ def modificar_contactos(contactos):
             print("ESTE CONTACTO NO ESTÁ REGISTRADO, NO SE PUEDE MODIFICAR")
             continue
         print("Nombre del contacto:", contacto[3])
-        nuevo_nombre = input("MODIFICACIÓN: ")#Pedir el nuevo nombre
-        if nuevo_nombre != "":#Si escribe un nombre nuevo
-            if len(nuevo_nombre) < 1 or len(nuevo_nombre) > 50:
-                print("EL NOMBRE DEBE TENER ENTRE 1 Y 50 CARACTERES")
+        while True:
+            nuevo_nombre = input("MODIFICACIÓN: ")
+            if len(nuevo_nombre) > 50:
+                print("EL NOMBRE NO PUEDE SUPERAR 50 CARACTERES")
                 continue
+            break
         print("Correo electrónico:", contacto[4])
-        nuevo_correo = input("MODIFICACIÓN: ")#Pedir el nuevo correo
-        if nuevo_correo != "":#Si escribe un correo nuevo
+        while True:
+            nuevo_correo = input("MODIFICACIÓN: ")
+            if nuevo_correo == "":
+                break
             if nuevo_correo.count("@") != 1 or " " in nuevo_correo:
                 print("CORREO ELECTRÓNICO INVÁLIDO")
                 continue
@@ -479,32 +513,52 @@ def modificar_contactos(contactos):
             if partes[0] == "" or partes[1] == "":
                 print("CORREO ELECTRÓNICO INVÁLIDO")
                 continue
+            break
         print("Dirección física:", contacto[5])
-        nueva_direccion = input("MODIFICACIÓN: ")#Pedir la nueva direccion
-        if nueva_direccion != "":#Si escribe una direccion nueva
+        while True:
+            nueva_direccion = input("MODIFICACIÓN: ")
             if len(nueva_direccion) > 80:
                 print("LA DIRECCIÓN NO PUEDE SUPERAR 80 CARACTERES")
                 continue
+            break
         print("Fecha de nacimiento:", contacto[6])
-        nueva_fecha = input("MODIFICACIÓN (dd/mm/aaaa, Enter para mantener): ")
-        if nueva_fecha != "":#Si escribe una fecha nueva
+        while True:
+            nueva_fecha = input("MODIFICACIÓN (dd/mm/aaaa, Enter para mantener): ")
+            if nueva_fecha == "":
+                break
             try:
-                datetime.strptime(nueva_fecha, "%d/%m/%Y")
+                partes_fecha = nueva_fecha.split("/")
+                if len(partes_fecha) != 3:
+                    print("FECHA DE NACIMIENTO INVÁLIDA")
+                    continue
+                if len(partes_fecha[0]) != 2 or len(partes_fecha[1]) != 2 or len(partes_fecha[2]) != 4:
+                    print("LA FECHA DEBE TENER EL FORMATO dd/mm/aaaa")
+                    continue
+                if not partes_fecha[0].isdigit() or not partes_fecha[1].isdigit() or not partes_fecha[2].isdigit():
+                    print("LA FECHA DEBE CONTENER SOLO NÚMEROS")
+                    continue
+                if partes_fecha[2] == "0000":
+                    fecha_validar = partes_fecha[0] + "/" + partes_fecha[1] + "/2000"
+                else:
+                    fecha_validar = nueva_fecha
+                datetime.strptime(fecha_validar, "%d/%m/%Y")
+                break
             except ValueError:
                 print("FECHA DE NACIMIENTO INVÁLIDA")
-                continue
         print("Pasatiempos:", contacto[7])
-        nuevos_pasatiempos = input("MODIFICACIÓN: ")#Pedir los nuevos pasatiempos
-        if nuevos_pasatiempos != "":#Si escribe nuevos pasatiempos
+        while True:
+            nuevos_pasatiempos = input("MODIFICACIÓN: ")
             if len(nuevos_pasatiempos) > 60:
                 print("LOS PASATIEMPOS NO PUEDEN SUPERAR 60 CARACTERES")
                 continue
+            break
         print("Notas:", contacto[8])
-        nuevas_notas = input("MODIFICACIÓN: ")#Pedir las nuevas notas
-        if nuevas_notas != "":#Si escribe nuevas notas
+        while True:
+            nuevas_notas = input("MODIFICACIÓN: ")
             if len(nuevas_notas) > 60:
                 print("LAS NOTAS NO PUEDEN SUPERAR 60 CARACTERES")
                 continue
+            break
         while True:#Pedir confirmacion para modificar el contacto
             opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
             if opcion == "A" or opcion == "a":
@@ -533,7 +587,7 @@ def modificar_contactos(contactos):
 
 #Opcion 3.4 Eliminar Contactos
 
-def eliminar_contactos(contactos):
+def eliminar_contactos(contactos,grupos,contactos_por_grupo):
     if len(contactos) == 0:
         print("NO HAY CONTACTOS REGISTRADOS")
         return
@@ -565,8 +619,25 @@ def eliminar_contactos(contactos):
         while True:#Confirmar si desea eliminar el contacto
             opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
             if opcion == "A" or opcion == "a":
-                contactos.remove(contacto)
-                print("Contacto eliminado correctamente")
+                pertenece = False
+                for lista_grupo in contactos_por_grupo:
+                    if (telefono, area) in lista_grupo:
+                        pertenece = True
+                        break
+                if pertenece == True:
+                    print("ESTE CONTACTO PERTENECE A UN GRUPO, NO SE PUEDE ELIMINAR")
+                else:
+                    while True:
+                        confirmar = input("CONFIRMA LA ELIMINACIÓN (SI/NO): ")
+                        if confirmar == "SI" or confirmar == "si":
+                            contactos.remove(contacto)
+                            print("Contacto eliminado correctamente")
+                            break
+                        elif confirmar == "NO" or confirmar == "no":
+                            print("Eliminación cancelada")
+                            break
+                        else:
+                            print("Ingrese SI o NO")
                 break
             elif opcion == "C" or opcion == "c":
                 print("Eliminación cancelada")
@@ -579,7 +650,7 @@ def eliminar_contactos(contactos):
                 
 #3.Registrar contactos
 
-def registrar_contactos(contactos, areas, configuracion):#Funcion para mostrar el menu de registrar contactos
+def registrar_contactos(contactos, areas, configuracion, grupos, contactos_por_grupo):#Funcion para mostrar el menu de registrar contactos
     while True:#Repetir el menu hasta que el usuario elija 0
         print("LISTA DIGITAL DE CONTACTOS")
         print()
@@ -599,7 +670,7 @@ def registrar_contactos(contactos, areas, configuracion):#Funcion para mostrar e
             case "3":#Opcion para modificar contactos
                 modificar_contactos(contactos)
             case "4":#Opcion para eliminar contactos
-                eliminar_contactos(contactos)
+                eliminar_contactos(contactos, grupos, contactos_por_grupo)
             case "0":#Regresar al menu principal
                 break
             case _:#Si el usuario escribe una opcion que no existe
@@ -737,8 +808,8 @@ def modificar_grupos(grupos, contactos_por_grupo):
                     break
                 else:
                     print("Ingrese A o C")
-                if opcion == "C" or opcion == "c":
-                    continue
+            if opcion == "C" or opcion == "c":
+                continue
         elif nuevo_nombre == nombre:
             print("El nombre del grupo se mantiene igual")
         elif nuevo_nombre != nombre:#Si el grupo ya existe, unir los contactos
@@ -768,12 +839,21 @@ def eliminar_grupos(grupos, contactos_por_grupo):
             print("ESTE GRUPO NO ESTÁ REGISTRADO, NO SE PUEDE ELIMINAR")
             continue
         indice = grupos.index(nombre)#Buscar la posicion del grupo
-        while True:#Pedir confirmacion
+        while True:
             opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
             if opcion == "A" or opcion == "a":
-                grupos.pop(indice)#Eliminar el grupo
-                contactos_por_grupo.pop(indice)#Eliminar sus contactos del grupo
-                print("Grupo eliminado correctamente")
+                while True:
+                    confirmar = input("CONFIRMA LA ELIMINACIÓN (SI/NO): ")
+                    if confirmar == "SI" or confirmar == "si":
+                        grupos.pop(indice)
+                        contactos_por_grupo.pop(indice)
+                        print("Grupo eliminado correctamente")
+                        break
+                    elif confirmar == "NO" or confirmar == "no":
+                        print("Eliminación cancelada")
+                        break
+                    else:
+                        print("Ingrese SI o NO")
                 break
             elif opcion == "C" or opcion == "c":
                 print("Eliminación cancelada")
@@ -813,11 +893,20 @@ def eliminar_contactos_grupos(grupos, contactos_por_grupo, contactos):
             if contacto[0] == telefono and contacto[1] == area:
                 print("Nombre contacto:", contacto[3])
                 break
-        while True: #Pedir confirmacion hasta que sea valida
+        while True:
             opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
             if opcion == "A" or opcion == "a":
-                contactos_por_grupo[indice].remove((telefono, area))
-                print("Contacto eliminado del grupo correctamente")
+                while True:
+                    confirmar = input("CONFIRMA LA ELIMINACIÓN (SI/NO): ")
+                    if confirmar == "SI" or confirmar == "si":
+                        contactos_por_grupo[indice].remove((telefono, area))
+                        print("Contacto eliminado del grupo correctamente")
+                        break
+                    elif confirmar == "NO" or confirmar == "no":
+                        print("Eliminación cancelada")
+                        break
+                    else:
+                        print("Ingrese SI o NO")
                 break
             elif opcion == "C" or opcion == "c":
                 print("Eliminación cancelada")
@@ -877,10 +966,8 @@ def cumple_filtro(dato, filtro):
     if filtro[0] != "%":#Verificar si el filtro no empieza con %
         if dato[:len(partes[0])] != partes[0]:#Comparar el inicio del dato con el filtro
             return False#El inicio no coincide
-    if filtro[-1] != "%":#Verificar si el filtro no termina con %
-        if dato[-len(partes[-1]):] != partes[-1]:#Comparar el final del dato
-            return False#El final no coincide
-        if posicion != len(dato):#Verificar que la ultima parte llegue al final
+    if filtro[-1] != "%":
+        if dato[len(dato) - len(partes[-1]):] != partes[-1]:
             return False
     return True#El dato cumple con el filtro
 
@@ -986,13 +1073,9 @@ def lista_contactos(contactos, grupos, contactos_por_grupo):#Mostrar y filtrar l
                 break
             else:#Si la opcion no es valida
                 print("Ingrese A o C")
-        break  #Regresar al menu principal
-
-
-
-
-
-
+        if opcion == "C" or opcion == "c":
+            continue
+        break
 
 
 
@@ -1036,11 +1119,11 @@ def principal():
         opcion = input("   OPCIÓN _")
         match opcion:
             case "1":
-                registrar_areas(areas) 
+                registrar_areas(areas,contactos) 
             case "2":
                 configurar_lista_contactos(areas,configuracion)
             case "3":
-                registrar_contactos(contactos, areas, configuracion)
+                registrar_contactos(contactos, areas, configuracion, grupos, contactos_por_grupo)
             case "4":
                 administrar_grupos(grupos, contactos_por_grupo, contactos)
             case "5":
