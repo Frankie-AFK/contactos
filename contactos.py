@@ -1,5 +1,10 @@
 from datetime import datetime#Importar datetime para validar fechas
-from reportlab.pdfgen import canvas  #Importar reportlab para generar archivos PDF
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import A3, landscape
+TIPOS_TELEFONO = ("M", "Móvil", "C", "Casa", "T", "Trabajo", "O", "Otro")
+from xml.sax.saxutils import escape
+
 
 
 #Opcion 1.1 agregar areas
@@ -32,7 +37,7 @@ def agregar_areas(areas):
         if repetido == False:#Si no hay repetidos
             while True:
                 nombre_area = input("Nombre del área         ")#Ingresar nombre de areas
-                if len(nombre_area) < 1 or len(nombre_area) > 40:#Validar la cantidad de caracteres
+                if nombre_area.strip() == "" or len(nombre_area) > 40:#Validar la cantidad de caracteres
                     print("Nombre del area debe ser dentro de 1 a 40 caracteres")
                     continue
                 break
@@ -105,10 +110,11 @@ def modificar_areas(areas):
                 encontrado = True#Indicar que encontramos el area
                 while True:
                     modificar = input("MODIFICACIÓN: ")#Pedir el nuevo nombre
-
+                    if modificar != "" and modificar.strip() == "":
+                        print("El nombre del área no puede contener solo espacios")
+                        continue
                     if modificar == "":#Si presiona Enter mantiene el nombre anterior
                         modificar = dato[1]
-
                     if len(modificar) > 40:#Validar que no supere los 40 caracteres
                         print("El nombre del área no puede superar los 40 caracteres")
                         continue
@@ -130,7 +136,7 @@ def modificar_areas(areas):
 
 #Opcion 1.4 eliminar areas
 
-def eliminar_areas(areas,contactos):
+def eliminar_areas(areas,contactos,configuracion):
     while True:#Repetir hasta que el usuario cancele
         print("LISTA DIGITAL DE CONTACTOS")
         print()
@@ -153,6 +159,10 @@ def eliminar_areas(areas,contactos):
                 while True:#Repetir hasta que ponga A o C
                     opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
                     if opcion == "A" or opcion == "a":
+                        if len(configuracion) > 0:
+                            if configuracion[0][0] == area:
+                                print("ESTA ÁREA ESTÁ CONFIGURADA POR OMISIÓN, NO SE PUEDE ELIMINAR")
+                                break
                         tiene_contactos = False
                         for contacto in contactos:
                             if contacto[1] == area:
@@ -187,7 +197,7 @@ def eliminar_areas(areas,contactos):
 #1 Registrar areas
 #La información de las áreas está en la lista areas, donde cada elemento es una tupla que tiene: - Área (entero >= 1 y <= 999) - Nombre del área (string entre 1 y 40 caracteres)
 
-def registrar_areas(areas,contactos):
+def registrar_areas(areas,contactos,configuracion):
     while True:
         print("             LISTA DIGITAL DE CONTACTOS")
         print()
@@ -206,7 +216,7 @@ def registrar_areas(areas,contactos):
             case "3":
                 modificar_areas(areas)
             case "4":
-                eliminar_areas(areas,contactos)
+                eliminar_areas(areas,contactos,configuracion)
             case "0":
                 break
             case _:
@@ -340,7 +350,7 @@ def agregar_contactos(contactos, areas, configuracion):
              continue
         while True:
             nombre = input("Nombre del contacto: ")
-            if len(nombre) < 1 or len(nombre) > 50:
+            if nombre.strip() == "" or len(nombre) > 50:
                 print("El nombre debe tener entre 1 y 50 caracteres")
                 continue
             break
@@ -497,7 +507,7 @@ def modificar_contactos(contactos):
         print("Nombre del contacto:", contacto[3])
         while True:
             nuevo_nombre = input("MODIFICACIÓN: ")
-            if len(nuevo_nombre) > 50:
+            if (nuevo_nombre != "" and nuevo_nombre.strip() == "") or len(nuevo_nombre) > 50:
                 print("EL NOMBRE NO PUEDE SUPERAR 50 CARACTERES")
                 continue
             break
@@ -616,6 +626,16 @@ def eliminar_contactos(contactos,grupos,contactos_por_grupo):
         if encontrado == False:
             print("ESTE CONTACTO NO ESTÁ REGISTRADO, NO SE PUEDE ELIMINAR")
             continue
+        print("DATOS DEL CONTACTO A ELIMINAR")
+        print("Teléfono:", contacto[0])
+        print("Área:", contacto[1])
+        print("Tipo de teléfono:", contacto[2])
+        print("Nombre:", contacto[3])
+        print("Correo electrónico:", contacto[4])
+        print("Dirección física:", contacto[5])
+        print("Fecha de nacimiento:", contacto[6])
+        print("Pasatiempos:", contacto[7])
+        print("Notas:", contacto[8])
         while True:#Confirmar si desea eliminar el contacto
             opcion = input("OPCIÓN A-ACEPTAR C-CANCELAR: ")
             if opcion == "A" or opcion == "a":
@@ -688,7 +708,7 @@ def agregar_grupos(grupos, contactos_por_grupo):
         nombre = input("Nombre del grupo (C para cancelar): ")
         if nombre == "C" or nombre == "c":
             return
-        if len(nombre) < 1 or len(nombre) > 40:
+        if nombre.strip() == "" or len(nombre) > 40:
             print("EL NOMBRE DEL GRUPO DEBE TENER ENTRE 1 Y 40 CARACTERES")
             continue#Volver a pedir el nombre del grupo
         if nombre in grupos:#Verificar si el grupo ya esta registrado
@@ -780,7 +800,7 @@ def modificar_grupos(grupos, contactos_por_grupo):
         nuevo_nombre = input("MODIFICACIÓN (Enter para mantener): ")#Pedir el nuevo nombre
         if nuevo_nombre == "":#Si no escribe nada, mantener el nombre actual
             nuevo_nombre = nombre
-        if len(nuevo_nombre) > 40:#Verificar el limite de caracteres
+        if nuevo_nombre.strip() == "" or len(nuevo_nombre) > 40:#Verificar el limite de caracteres
             print("EL NOMBRE DEL GRUPO NO PUEDE SUPERAR 40 CARACTERES")
             continue
         if nuevo_nombre in grupos and nuevo_nombre != nombre:#Verificar si el nuevo grupo ya existe
@@ -884,6 +904,9 @@ def eliminar_contactos_grupos(grupos, contactos_por_grupo, contactos):
         if not telefono.isdigit() or not area.isdigit(): #Verificar que sean numeros
             print("EL TELÉFONO Y EL ÁREA DEBEN SER NUMÉRICOS")
             continue
+        if len(telefono) < 5 or len(telefono) > 12:
+            print("EL TELÉFONO DEBE TENER ENTRE 5 Y 12 DÍGITOS")
+            continue
         telefono = int(telefono) #Convertir el telefono a entero
         area = int(area) #Convertir el area a entero
         if (telefono, area) not in contactos_por_grupo[indice]: #Verificar si pertenece al grupo
@@ -942,6 +965,8 @@ def administrar_grupos(grupos, contactos_por_grupo, contactos):
             eliminar_contactos_grupos(grupos, contactos_por_grupo, contactos)
         elif opcion == "0":
             break
+        else:
+            print("ESTA OPCIÓN NO EXISTE")
 
 
 
@@ -955,7 +980,12 @@ def cumple_filtro(dato, filtro):
     partes = filtro.split("%")#Separar el filtro donde aparece %
     if "%" not in filtro:#Si no hay %, comparar el texto completo
         return dato == filtro
-    posicion = 0#Posicion desde donde se empieza a buscar
+    posicion = 0
+    if filtro[0] != "%":
+        if dato[:len(partes[0])] != partes[0]:
+            return False
+        posicion = len(partes[0])
+        partes = partes[1:]
     for parte in partes:#Recorrer las partes del filtro
         if parte == "":#Ignorar las partes vacias
             continue
@@ -964,63 +994,35 @@ def cumple_filtro(dato, filtro):
             return False
         posicion = indice + len(parte)#Continuar despues de la parte encontrada
     if filtro[0] != "%":#Verificar si el filtro no empieza con %
-        if dato[:len(partes[0])] != partes[0]:#Comparar el inicio del dato con el filtro
-            return False#El inicio no coincide
+        inicio = filtro.split("%")[0]
+        if dato[:len(inicio)] != inicio:
+            return False
     if filtro[-1] != "%":
-        if dato[len(dato) - len(partes[-1]):] != partes[-1]:
+        final = filtro.split("%")[-1]
+        if dato[len(dato) - len(final):] != final:
             return False
     return True#El dato cumple con el filtro
-
-
-
-#Escribir texto en el PDF sin salir del margen
-
-def escribir_texto(pdf, texto, y):
-    palabras = str(texto).split()#Separar el texto en palabras
-    linea = ""#Guardar las palabras de cada linea
-    for palabra in palabras:#Recorrer las palabras del texto
-        prueba = linea + palabra + " "#Agregar una palabra a la linea
-        if pdf.stringWidth(prueba, "Helvetica", 14) <= 490:#Verificar si cabe
-            linea = prueba#Guardar la palabra en la linea
-        else:#Si la palabra no cabe
-            if linea != "":#Verificar que haya texto
-                pdf.drawString(50, y, linea)#Escribir la linea
-                y = y - 20#Bajar a la siguiente linea
-            linea = palabra + " "#Empezar otra linea
-    if linea != "":#Verificar si queda texto por escribir
-        pdf.drawString(50, y, linea)#Escribir la ultima linea
-        y = y - 20#Bajar a la siguiente linea
-    return y#Devolver la posicion vertical actualizada
-        
+       
 
 
 #Generar un archivo PDF con los contactos encontrados
 
 def generar_pdf(resultados):
-    pdf = canvas.Canvas("lista_contactos.pdf")#Crear el archivo PDF
-    pdf.setFont("Helvetica", 14)#Establecer el tipo y tamaño de letra
-    pdf.drawString(50, 800, "LISTA DIGITAL DE CONTACTOS")#Escribir el titulo
-    y = 770#Posicion vertical donde empiezan los contactos
-    for contacto in resultados:#Recorrer los contactos encontrados
-        if y < 250:  #Verificar si queda espacio para otro contacto
-            pdf.showPage()  #Crear una nueva pagina
-            pdf.setFont("Helvetica", 14)  #Establecer nuevamente la letra
-            y = 800  #Volver a la parte superior de la pagina
-        y = escribir_texto(pdf, "Nombre: " + str(contacto[3]), y)  #Escribir el nombre y actualizar la posicion
-        y = escribir_texto(pdf, "Telefono: " + str(contacto[0]), y)  #Escribir el telefono y bajar de linea
-        y = escribir_texto(pdf, "Area: " + str(contacto[1]), y)  #Escribir el codigo de area y bajar de linea
-        y = escribir_texto(pdf, "Tipo: " + str(contacto[2]), y)  #Escribir el tipo de telefono
-        y = escribir_texto(pdf, "Correo: " + str(contacto[4]), y)  #Escribir el correo electronico
-        y = escribir_texto(pdf, "Direccion: " + str(contacto[5]), y)  #Escribir la direccion
-        y = escribir_texto(pdf, "Fecha de nacimiento: " + str(contacto[6]), y)  #Escribir la fecha
-        y = escribir_texto(pdf, "Pasatiempos: " + str(contacto[7]), y)  #Escribir los pasatiempos
-        y = escribir_texto(pdf, "Notas: " + str(contacto[8]), y)  #Escribir las notas
-
-        y = y - 10  #Dejar espacio antes del siguiente contacto
-    pdf.save()#Guardar el archivo PDF
-
-
-
+    pdf = SimpleDocTemplate("lista_contactos.pdf", pagesize=landscape(A3))
+    estilos = getSampleStyleSheet()
+    titulos = ["Nombre", "Teléfono", "Área", "Tipo", "Correo", "Dirección", "Fecha", "Pasatiempos", "Notas"]
+    tabla_datos = [titulos]
+    for contacto in resultados:
+        datos = [contacto[3], contacto[0], contacto[1], contacto[2],
+                 contacto[4], contacto[5], contacto[6], contacto[7], contacto[8]]
+        fila = []
+        for dato in datos:
+            fila.append(Paragraph(escape(str(dato)), estilos["Normal"]))
+        tabla_datos.append(fila)
+    tabla = Table(tabla_datos, colWidths=[125, 80, 45, 45, 135, 180, 85, 180, 180], repeatRows=1)
+    tabla.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, "black"),("VALIGN", (0, 0), (-1, -1), "TOP"),("FONTSIZE", (0, 0), (-1, 0), 9),("BACKGROUND", (0, 0), (-1, 0), "#DDDDDD"),]))
+    pdf.build([tabla])
+    
 
 
 #5. Lista de contactos
@@ -1103,7 +1105,6 @@ def principal():
     contactos = []
     grupos = []
     contactos_por_grupo = []
-    TIPOS_TELEFONO = ("M", "Móvil", "C", "Casa", "T", "Trabajo", "O", "Otro")
     while True:
         print("     LISTA DIGITAL DE CONTACTOS")#Haciendo lo mas parecido a lo que esta en el pdf posible
         print()
@@ -1119,7 +1120,7 @@ def principal():
         opcion = input("   OPCIÓN _")
         match opcion:
             case "1":
-                registrar_areas(areas,contactos) 
+                registrar_areas(areas,contactos,configuracion) 
             case "2":
                 configurar_lista_contactos(areas,configuracion)
             case "3":
