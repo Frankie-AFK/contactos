@@ -1080,18 +1080,31 @@ def lista_contactos(contactos, grupos, contactos_por_grupo):#Mostrar y filtrar l
 
 
 
+
+#6 Ayuda
+def ayuda():#Funcion para abrir el manual de usuario
+    import os#Importar el modulo os
+    archivo = "manual_de_usuario_contactos.pdf"#Nombre del archivo PDF
+    if os.path.exists(archivo):#Verificar si existe el archivo
+        os.startfile(archivo)#Abrir el manual PDF
+    else:#Si no existe el archivo
+        print("No se encontró el manual de usuario")#Mostrar mensaje de error
+    input("Presione Enter para continuar...")#Esperar que el usuario presione Enter
+
+
+
 #7 Acerca de
 
-def acerca_de():
-    print("LISTA DIGITAL DE CONTACTOS")
+def acerca_de():#Funcion para mostrar la informacion del programa
+    print("LISTA DIGITAL DE CONTACTOS")#Mostrar el nombre del programa
     print()
-    print("ACERCA DE")
+    print("ACERCA DE")#Mostrar el titulo
     print()
-    print("Nombre: Lista Digital de Contactos")
-    print("Version: 1.0")
-    print("Fecha de creacion: Octubre 2026")
-    print("Autor: Frankie Cheng Zheng")
-    input("Presione Enter para continuar...")
+    print("Nombre: Lista Digital de Contactos")#Mostrar el nombre
+    print("Version: 1.0")#Mostrar la version
+    print("Fecha de creacion: Octubre 2026")#Mostrar la fecha
+    print("Autor: Frankie Cheng Zheng")#Mostrar el autor
+    input("Presione Enter para continuar...")#Esperar que el usuario presione Enter
 
 
                 
@@ -1128,6 +1141,8 @@ def principal():
                 administrar_grupos(grupos, contactos_por_grupo, contactos)
             case "5":
                 lista_contactos(contactos, grupos, contactos_por_grupo)
+            case "6":
+                ayuda()
             case "7":
                 acerca_de()
                 
