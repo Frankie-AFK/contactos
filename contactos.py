@@ -363,6 +363,9 @@ def agregar_contactos(contactos, areas, configuracion):
             if partes[0] == "" or partes[1] == "":#Verificar que haya texto antes y despues del @
                 print("El correo debe tener texto antes y despues del @")
                 continue
+            if "." not in partes[1] or partes[1][0] == "." or partes[1][-1] == ".":#Verificar que el dominio tenga un punto y no empiece ni termine con punto
+                print("El correo debe tener un punto válido después del @")
+                continue
             if " " in correo:#Verificar que el correo no tenga espacios
                 print("El correo no puede contener espacios")
                 continue
@@ -522,6 +525,9 @@ def modificar_contactos(contactos):
             partes = nuevo_correo.split("@")#Separar el correo en dos partes
             if partes[0] == "" or partes[1] == "":#Verificar que haya texto antes y despues del @
                 print("CORREO ELECTRÓNICO INVÁLIDO")
+                continue
+            if "." not in partes[1] or partes[1][0] == "." or partes[1][-1] == ".":#Verificar que el dominio tenga un punto y no empiece ni termine con punto
+                print("EL CORREO DEBE TENER UN PUNTO VÁLIDO DESPUÉS DEL @")
                 continue
             break
         print("Dirección física:", contacto[5])
